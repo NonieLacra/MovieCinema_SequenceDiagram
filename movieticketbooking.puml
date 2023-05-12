@@ -1,0 +1,98 @@
+@startuml
+
+actor Admin
+actor User
+participant UI
+participant MovieList
+participant Reservation
+participant Payment
+participant Gateway
+Database Database
+
+=== Search Movie ==
+User -> UI : POST / movie
+UI -> MovieList : POST / movie:title
+MovieList -> Database : GET / movie:title
+Database -> MovieList : 200 OK
+MovieList -> UI : 200 OK
+UI -> User : Display Result
+
+=== View Movie Details ==
+User -> UI : VIEW / movie
+UI -> MovieList : VIEW / movie:id
+MovieList -> Database : GET / movie:id / movie:name, movie:details, showtime:id
+Database -> MovieList : 200 OK
+MovieList -> UI : 200 OK
+UI -> User : Display Result
+
+
+=== Checking of Movie Showtime and Seat ==
+User -> UI : POST / movie / showtime / seat
+UI -> MovieList: POST / movie:id / showtime:id / seat:id
+MovieList -> Database : GET / movie:id / showtime:id / seat:id
+Database -> MovieList : 200 OK
+MovieList -> UI : 200 OK
+UI -> User : Display Result
+
+=== Reservation ==
+User -> UI : POST / movie / showtime / seat
+UI -> Reservation : POST / movie:id / showtime:id / seat:id
+Reservation -> Database : POST / movie:id / showtime:id / seat:id
+Database -> Reservation : 201 Created
+Reservation -> UI : 201 Created
+UI -> User : Display Result
+
+=== Payment ==
+User -> UI : POST / checkout
+UI -> Reservation : POST / checkout:id
+Reservation -> Payment : POST / checkout:id
+Payment -> UI : GET / payment
+UI -> Payment : POST / payment
+Payment -> Gateway : POST / payment
+Gateway -> Payment : 200 OK
+Payment ->  Gateway : PUT / payment:id
+Gateway -> Payment : 204 No Content
+Payment -> Database : POST / payment:id
+Database -> Payment : 201 Created
+Payment -> UI : 201 Created
+UI -> User : Display Result
+
+=== Add Movie ==
+Admin -> UI : POST / movie
+UI -> MovieList : POST / movie
+MovieList -> Database : POST / movie:id
+Database -> MovieList : 201 Created
+MovieList -> UI : 201 Created
+UI -> Admin : Display Result
+
+=== Remove Movie ==
+Admin -> UI : DELETE / movie
+UI -> MovieList : DELETE / movie:id
+MovieList -> Database : DELETE / movie:id
+Database -> MovieList : 204 No Content
+MovieList -> UI : 204 No Content
+UI -> Admin : Display Result
+
+=== Manage Showtime ==
+Admin -> UI : PUT / showtime
+UI -> MovieList : PUT / showtime:id
+MovieList -> Database : PUT / showtime:id
+Database -> MovieList : 204 No Content
+MovieList -> UI : 204 No Content
+UI -> Admin : Display Result
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@enduml
